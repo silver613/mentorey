@@ -1,14 +1,10 @@
 import InsideLayout from '~/layouts/InsideLayout';
 import React, { useState, useEffect } from 'react';
-import { useMediaQuery, Box, Tabs, Tab, Button } from '@mui/material';
+import { useMediaQuery, Box, Tabs, Tab } from '@mui/material';
 import TabContext from '@mui/lab/TabContext';
-import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
 import CastForEducationIcon from '@mui/icons-material/CastForEducation';
-import SchoolIcon from '@mui/icons-material/School';
-import AnalyticsIcon from '@mui/icons-material/Analytics';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import EmojiPeopleIcon from '@mui/icons-material/EmojiPeople';
 import MyLessons from '~/components/pages/dashboard/MyLessons';
 // Tab Contents
 
