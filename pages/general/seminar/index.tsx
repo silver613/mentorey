@@ -2,12 +2,12 @@ import { Container } from '@mui/material';
 import InsideLayout from '~/layouts/InsideLayout';
 import SeminarHero from './Hero';
 import SeminarMainBoard from './SeminarMain';
-import type { InferGetStaticPropsType } from 'next';
+import type { InferGetStaticPropsType, InferGetServerSidePropsType } from 'next';
 import axios from 'axios';
 import { DateTime } from 'luxon';
 import getAllCategories from '~/lib/getAllCategories';
 
-export default function SeminarPage({ seminars, categories }: InferGetStaticPropsType<typeof getStaticProps>) {
+export default function SeminarPage({ seminars, categories }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   return (
     <InsideLayout>
       <Container>
@@ -18,9 +18,9 @@ export default function SeminarPage({ seminars, categories }: InferGetStaticProp
   );
 }
 
-export const getStaticProps = async () => {
+export const getServerSideProps = async () => {
   try {
-    const { data: res } = await axios.get('http://localhost:3000/api/common/get-all-active-seminars');
+    const { data: res } = await axios.get(`${process.env.BASIC_URL}/api/common/get-all-active-seminars`);
     const seminarBasics = res.seminars;
 
     const seminarInstances = await Promise.all(

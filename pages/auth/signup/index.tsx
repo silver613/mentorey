@@ -13,6 +13,7 @@ import useSetAuthState from '~/hooks/useSetAuthState';
 import Link from 'next/link';
 import { AdapterLuxon } from '@mui/x-date-pickers/AdapterLuxon';
 import { DateTime } from 'luxon';
+import axios from 'axios';
 
 export default function SignUpPage() {
   // Signup parameters
@@ -91,17 +92,13 @@ export default function SignUpPage() {
     }
   };
 
-  function Register() {
+  async function Register() {
     const tempDay = new Date(birthday);
     const formattedDate = tempDay.toISOString().split('T')[0];
 
-    const url = '/api/auth/signup';
-    const request = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
+    try {
+      setSpin(true);
+      const result = await axios.post('/api/auth/signup', {
         firstName,
         lastName,
         email,
@@ -110,24 +107,21 @@ export default function SignUpPage() {
         country: country?.code,
         birthday: formattedDate,
         timezone: DateTime.now().zoneName,
-      }),
-    };
-    setSpin(true);
-    fetch(url, request)
-      .then((res) => res.json())
-      .then((data) => handleResponse(data))
-      .catch((err) => {
-        toast.error('Registration failed. Please insert valid information.');
-      })
-      .finally(() => {
-        setSpin(false);
       });
+
+      handleResponse(result.data);
+    } catch (error) {
+      console.log(error);
+      toast.error('Registration failed. Please insert valid information.');
+    } finally {
+      setSpin(false);
+    }
   }
 
   function handleResponse(data: any) {
     if (data.message) {
-      console.log(data.message);
-      if (data.message === 'Email_Exists') toast.error('Your email has already taken. Please sign in.');
+      if (data.message === 'Email_Exists')
+        toast.error('Your email has already taken. Please try with another email or Sign in.');
       return false;
     } else if (data.newUser) {
       setAuthState(data.newUser);

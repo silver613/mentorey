@@ -12,7 +12,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { CurrencyData } from '~/shared/CurrencyData';
 
-const stripePromise = loadStripe('pk_test_gktDH2EZfKhkRYLkJGwjQQuQ00O15ZHjaO');
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 const SeminarTypes: any = {
   MIN30: { value: 0.5, label: '30 min' },
@@ -96,7 +96,7 @@ const CheckoutForm = ({
     const result = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url: 'http://localhost:3000/payment/ConfirmPayment',
+        return_url: `${process.env.BASIC_URL}/payment/ConfirmPayment`,
       },
       redirect: 'if_required',
     });

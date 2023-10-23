@@ -12,31 +12,27 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
-} from "@mui/material";
-import BlankLayout from "~/layouts/BlankLayout";
-import { useSelector } from "react-redux";
-import { selectAuthState } from "~/slices/authSlice";
-import { selectLessonBookingState } from "~/slices/lessonBookingSlice";
-import ReactCountryFlag from "react-country-flag";
-import { countries } from "~/shared/data";
-import axios from "axios";
-import { useQuery } from "react-query";
-import currencyConverter from "~/utils/currencyConverter";
-import { CurrencyData } from "~/shared/CurrencyData";
-import styled from "@emotion/styled";
-import { Elements } from "@stripe/react-stripe-js";
-import { loadStripe } from "@stripe/stripe-js";
-import {
-  useStripe,
-  useElements,
-  PaymentElement,
-} from "@stripe/react-stripe-js";
-import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import { useRouter } from "next/router";
-import Link from "next/link";
+} from '@mui/material';
+import BlankLayout from '~/layouts/BlankLayout';
+import { useSelector } from 'react-redux';
+import { selectAuthState } from '~/slices/authSlice';
+import { selectLessonBookingState } from '~/slices/lessonBookingSlice';
+import ReactCountryFlag from 'react-country-flag';
+import { countries } from '~/shared/data';
+import axios from 'axios';
+import { useQuery } from 'react-query';
+import currencyConverter from '~/utils/currencyConverter';
+import { CurrencyData } from '~/shared/CurrencyData';
+import styled from '@emotion/styled';
+import { Elements } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
+import { useStripe, useElements, PaymentElement } from '@stripe/react-stripe-js';
+import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
+import { useRouter } from 'next/router';
+import Link from 'next/link';
 
-const stripePromise = loadStripe("pk_test_gktDH2EZfKhkRYLkJGwjQQuQ00O15ZHjaO");
+const stripePromise = loadStripe('pk_test_gktDH2EZfKhkRYLkJGwjQQuQ00O15ZHjaO');
 
 const StyledCaption = styled.span`
   font-size: 16px;
@@ -44,7 +40,7 @@ const StyledCaption = styled.span`
   color: #383838;
 `;
 
-type LessonType = "MIN30" | "MIN60" | "MIN90";
+type LessonType = 'MIN30' | 'MIN60' | 'MIN90';
 
 const lessonTypeSet = {
   MIN30: 0.5,
@@ -53,18 +49,18 @@ const lessonTypeSet = {
 };
 
 const LessonTypeLabels = {
-  MIN30: "30 minutes",
-  MIN60: "60 minutes",
-  MIN90: "90 minutes",
+  MIN30: '30 minutes',
+  MIN60: '60 minutes',
+  MIN90: '90 minutes',
 };
 
 const trialLesson = {
-  description: "",
-  purpose: "",
+  description: '',
+  purpose: '',
   isTrialLesson: true,
 };
 
-const testPromoCode = "123456";
+const testPromoCode = '123456';
 
 export default function LessonBookingCheckout() {
   const [price, setPrice] = useState<number>();
@@ -72,19 +68,18 @@ export default function LessonBookingCheckout() {
   const [promocode, setPromocode] = useState<string>();
   const [clientSecret, setClientSecret] = useState<string>();
 
-  const { coach, lessonID, lessonPack, lessonType, timeline, channel } =
-    useSelector(selectLessonBookingState) || {};
+  const { coach, lessonID, lessonPack, lessonType, timeline, channel } = useSelector(selectLessonBookingState) || {};
   const curUser = useSelector(selectAuthState);
   const country = countries.find((item) => item.code === coach.country);
   const currencySymbol = CurrencyData[curUser.currency].symbol;
 
   const { data: lesson } = useQuery({
-    queryKey: ["getLessonByID", lessonID],
+    queryKey: ['getLessonByID', lessonID],
     queryFn: async () => {
-      if (lessonID === "trial") {
+      if (lessonID === 'trial') {
         return trialLesson;
       } else {
-        const api = "/api/common/getLessonByID";
+        const api = '/api/common/getLessonByID';
         const { data: response } = await axios.post(api, { lessonID });
         return { ...response.lesson, isTrialLesson: false };
       }
@@ -95,18 +90,10 @@ export default function LessonBookingCheckout() {
   const getPrice = async () => {
     if (lesson) {
       if (lesson.isTrialLesson) {
-        const trialPrice = await currencyConverter(
-          coach.currency,
-          curUser.currency,
-          coach.trial_price
-        );
+        const trialPrice = await currencyConverter(coach.currency, curUser.currency, coach.trial_price);
         return trialPrice;
       } else {
-        const initialPrice = await currencyConverter(
-          coach.currency,
-          curUser.currency,
-          lesson.price
-        );
+        const initialPrice = await currencyConverter(coach.currency, curUser.currency, lesson.price);
         if (lessonPack > 1) {
           setOriginPrice(
             parseFloat(
@@ -114,32 +101,19 @@ export default function LessonBookingCheckout() {
                 lessonPack *
                 lessonTypeSet[lessonType as LessonType] *
                 ((initialPrice * (100 - lesson.disRate)) / 100)
-              ).toFixed(2)
-            )
+              ).toFixed(2),
+            ),
           );
           return parseFloat(
             (
-              (lessonPack *
-                lessonTypeSet[lessonType as LessonType] *
-                ((initialPrice * (100 - lesson.disRate)) / 100)) /
+              (lessonPack * lessonTypeSet[lessonType as LessonType] * ((initialPrice * (100 - lesson.disRate)) / 100)) /
                 0.97 +
               1
-            ).toFixed(2)
+            ).toFixed(2),
           );
         } else if (lessonPack === 1) {
-          setOriginPrice(
-            parseFloat(
-              (lessonTypeSet[lessonType as LessonType] * initialPrice).toFixed(
-                2
-              )
-            )
-          );
-          return parseFloat(
-            (
-              (lessonTypeSet[lessonType as LessonType] * initialPrice) / 0.97 +
-              1
-            ).toFixed(2)
-          );
+          setOriginPrice(parseFloat((lessonTypeSet[lessonType as LessonType] * initialPrice).toFixed(2)));
+          return parseFloat(((lessonTypeSet[lessonType as LessonType] * initialPrice) / 0.97 + 1).toFixed(2));
         }
       }
     }
@@ -168,7 +142,7 @@ export default function LessonBookingCheckout() {
     if (price) {
       (async () => {
         try {
-          const api = "/api/payment/create-payment-intent";
+          const api = '/api/payment/create-payment-intent';
           const params = {
             amount: price,
             currency: curUser.currency,
@@ -182,11 +156,11 @@ export default function LessonBookingCheckout() {
     }
   }, [price]);
 
-  const { data: category = { label: "Trial Lesson" } } = useQuery({
-    queryKey: ["getLessonCategoryByID", lesson],
+  const { data: category = { label: 'Trial Lesson' } } = useQuery({
+    queryKey: ['getLessonCategoryByID', lesson],
     queryFn: async () => {
       if (!lesson.isTrialLesson) {
-        const api = "/api/common/getCategoryByID";
+        const api = '/api/common/getCategoryByID';
         try {
           const { data: res } = await axios.post(api, {
             categoryID: lesson.categoryID,
@@ -210,54 +184,47 @@ export default function LessonBookingCheckout() {
             sx={{ minWidth: 350 }}
           >
             <Box className="w-full md:w-1/2">
-              <Box display={"flex"} alignItems={"center"}>
+              <Box display={'flex'} alignItems={'center'}>
                 <Tooltip title={country?.label}>
                   <Badge
                     overlap="circular"
                     className="rounded-full shadow-md"
-                    anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                     badgeContent={
                       <ReactCountryFlag
                         countryCode={coach.country}
                         svg
                         style={{
-                          width: "15px",
-                          height: "15px",
-                          border: "1px solid white",
-                          borderRadius: "20px",
-                          objectFit: "cover",
+                          width: '15px',
+                          height: '15px',
+                          border: '1px solid white',
+                          borderRadius: '20px',
+                          objectFit: 'cover',
                         }}
                       />
                     }
                   >
                     <Avatar
-                      sx={{ width: "55px", height: "55px" }}
-                      alt={coach.first_name + " " + coach.last_name}
+                      sx={{ width: '55px', height: '55px' }}
+                      alt={coach.first_name + ' ' + coach.last_name}
                       src={coach.avatar}
                     />
                   </Badge>
                 </Tooltip>
-                <Box marginLeft={"20px"}>
+                <Box marginLeft={'20px'}>
                   <Typography className="first-letter:capitalize text-lg font-semibold">
                     {`${coach.first_name} ${coach.last_name}`}
                   </Typography>
-                  <Typography className="text-slate-600 text-sm">
-                    {coach.title || ""}
-                  </Typography>
+                  <Typography className="text-slate-600 text-sm">{coach.title || ''}</Typography>
                 </Box>
               </Box>
 
               <DetailComponent caption="Category" content={category.label} />
               <DetailComponent
                 caption="Lesson Type"
-                content={`${
-                  LessonTypeLabels[lessonType as LessonType]
-                } / ${lessonPack}lessons`}
+                content={`${LessonTypeLabels[lessonType as LessonType]} / ${lessonPack}lessons`}
               />
-              <DetailComponent
-                caption="Description"
-                content={lesson.description}
-              />
+              <DetailComponent caption="Description" content={lesson.description} />
               <DetailComponent caption="Aimed at" content={lesson.purpose} />
             </Box>
             <Box className="w-full md:w-1/2 lg:p-4">
@@ -279,13 +246,7 @@ export default function LessonBookingCheckout() {
   );
 }
 
-function DetailComponent({
-  caption,
-  content,
-}: {
-  caption: string;
-  content: string;
-}) {
+function DetailComponent({ caption, content }: { caption: string; content: string }) {
   return (
     <Box className="break-words">
       <Typography className="my-3 text-sm font-medium text-gray-400">
@@ -309,8 +270,7 @@ const CheckoutForm = ({
   const [isPaying, setIsPaying] = useState<boolean>(false);
 
   const curUser = useSelector(selectAuthState);
-  const { coach, lessonID, lessonPack, lessonType, timeline, channel } =
-    useSelector(selectLessonBookingState) || {};
+  const { coach, lessonID, lessonPack, lessonType, timeline, channel } = useSelector(selectLessonBookingState) || {};
 
   const router = useRouter();
 
@@ -328,31 +288,25 @@ const CheckoutForm = ({
     const result = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url: "http://localhost:3000/payment/ConfirmPayment",
+        return_url: `${process.env.BASIC_URL}/payment/ConfirmPayment`,
       },
-      redirect: "if_required",
+      redirect: 'if_required',
     });
     if (result.error) {
       setIsPaying(false);
-      if (result.error.code === "card_declined")
-        toast.error("Sorry! Your card has been declined.");
-      if (result.error.code === "expired_card")
-        toast.error("Sorry! Your card has been expired.");
-      if (result.error.code === "incorrect_cvc")
-        toast.error("Sorry! Please insert valid CVC.");
-      if (result.error.code === "incorrect_number")
-        toast.error("Sorry! Please insert valid card number.");
-      if (result.error.code === "processing_error")
-        toast.error(
-          "Sorry! Something went wrong. Check your card information again."
-        );
+      if (result.error.code === 'card_declined') toast.error('Sorry! Your card has been declined.');
+      if (result.error.code === 'expired_card') toast.error('Sorry! Your card has been expired.');
+      if (result.error.code === 'incorrect_cvc') toast.error('Sorry! Please insert valid CVC.');
+      if (result.error.code === 'incorrect_number') toast.error('Sorry! Please insert valid card number.');
+      if (result.error.code === 'processing_error')
+        toast.error('Sorry! Something went wrong. Check your card information again.');
     } else {
-      const api = "/api/common/save-lesson-booking";
+      const api = '/api/common/save-lesson-booking';
 
       const param: any = {};
       param.buyerID = curUser.id;
       param.coachID = coach.id;
-      param.lessonID = lessonID === "trial" ? 0 : lessonID;
+      param.lessonID = lessonID === 'trial' ? 0 : lessonID;
       param.lessonPack = lessonPack;
       param.lessonType = lessonType;
       param.timeline = timeline;
@@ -364,9 +318,9 @@ const CheckoutForm = ({
 
       try {
         await axios.post(api, param);
-        router.push("/payment/ConfirmPayment");
+        router.push('/payment/ConfirmPayment');
       } catch (err) {
-        toast.error("Sorry! Something went wrong. Please try again.");
+        toast.error('Sorry! Something went wrong. Please try again.');
         console.log(err);
       }
     }
@@ -393,12 +347,12 @@ interface ModalProps {
 
 function PromoModal({ sendPromocode }: ModalProps) {
   const [isOpen, setIsOpen] = useState<boolean>(true);
-  const [code, setCode] = useState<string>("");
+  const [code, setCode] = useState<string>('');
   const handleClose = () => {
     if (code) {
       sendPromocode(code);
     } else {
-      sendPromocode("not_defined");
+      sendPromocode('not_defined');
     }
     setIsOpen(false);
   };
@@ -407,19 +361,12 @@ function PromoModal({ sendPromocode }: ModalProps) {
       <DialogTitle>Promocode</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          Mentorey provides promo code to help students. If you have got one,
-          please insert below. <br />
-          <strong>
-            But please note that the promo code is usable for only one time.
-          </strong>{" "}
-          <br />
-          You can check your promocode on your{" "}
-          <Link
-            href={"/pupil/dashboard"}
-            className="font-semibold text-primary-700"
-          >
+          Mentorey provides promo code to help students. If you have got one, please insert below. <br />
+          <strong>But please note that the promo code is usable for only one time.</strong> <br />
+          You can check your promocode on your{' '}
+          <Link href={'/pupil/dashboard'} className="font-semibold text-primary-700">
             dashboard
-          </Link>{" "}
+          </Link>{' '}
           page.
         </DialogContentText>
         <TextField
@@ -436,11 +383,7 @@ function PromoModal({ sendPromocode }: ModalProps) {
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>Cancel</Button>
-        <Button
-          onClick={handleClose}
-          variant="contained"
-          className="bg-primary-600"
-        >
+        <Button onClick={handleClose} variant="contained" className="bg-primary-600">
           Redeem
         </Button>
       </DialogActions>
