@@ -47,14 +47,14 @@ const signupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 
       // // Send verification email
 
-      // await transporter.sendMail({
-      //   to: 'bestwing915@gmail.com',
-      //   subject: 'Email Verification',
-      //   html: `
-      //     <h1>Verify Code</h1>
-      //     <p>${user.verification_token}</p>
-      //   `,
-      // });
+      await transporter.sendMail({
+        to: 'bestwing915@gmail.com',
+        subject: 'Email Verification',
+        html: `
+          <h1>Verify Code</h1>
+          <p>${user.verification_token}</p>
+        `,
+      });
 
       res.status(200).json({ newUser: newUser[0] });
     } catch (error) {
