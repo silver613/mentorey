@@ -2,7 +2,6 @@ import { NextApiRequest, NextApiResponse } from 'next';
 
 import bcrypt from 'bcrypt';
 import db from '~/database/db';
-import transporter from '~/mail/mailer';
 import { RowDataPacket, ResultSetHeader } from 'mysql2/promise';
 import { generateVerificationCode } from '~/utils/utils';
 
@@ -47,15 +46,15 @@ const signupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
 
       // // Send verification email
 
-      await transporter.sendMail({
-        from: 'bestwing@mentorey.awsapps.com',
-        to: 'bestwing915@gmail.com',
-        subject: 'Email Verification',
-        html: `
-          <h1>Verify Code</h1>
-          <p>${user.verification_token}</p>
-        `,
-      });
+      // await transporter.sendMail({
+      //   from: 'bestwing@mentorey.awsapps.com',
+      //   to: 'bestwing915@gmail.com',
+      //   subject: 'Email Verification',
+      //   html: `
+      //     <h1>Verify Code</h1>
+      //     <p>${user.verification_token}</p>
+      //   `,
+      // });
 
       res.status(200).json({ newUser: newUser[0] });
     } catch (error) {
