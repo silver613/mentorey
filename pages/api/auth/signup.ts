@@ -48,6 +48,7 @@ const signupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
       // // Send verification email
 
       await transporter.sendMail({
+        from: 'bestwing@mentorey.awsapps.com',
         to: 'bestwing915@gmail.com',
         subject: 'Email Verification',
         html: `
