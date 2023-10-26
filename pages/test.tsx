@@ -1,6 +1,5 @@
 import { Button } from '@mui/material';
 import axios from 'axios';
-import sendEmail from '~/mail/ses';
 
 export default function TestPage() {
   const send = async () => {
@@ -13,7 +12,7 @@ export default function TestPage() {
 
   return (
     <>
-      <Button onClick={sendEmail}>test</Button>
+      <Button onClick={send}>test</Button>
     </>
   );
 }

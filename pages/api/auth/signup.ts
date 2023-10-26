@@ -13,7 +13,7 @@ const signupHandler = async (req: NextApiRequest, res: NextApiResponse) => {
       const [existingUser] = (await db.execute('SELECT id FROM users WHERE email = ?', [email])) as RowDataPacket[];
 
       if (existingUser.length > 0) {
-        return res.status(400).json({ message: 'Email_Exists' });
+        return res.status(200).json({ message: 'Email_Exists' });
       }
 
       // Generate verification token expries 6 hours from now

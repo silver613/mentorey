@@ -14,6 +14,8 @@ import Link from 'next/link';
 import { AdapterLuxon } from '@mui/x-date-pickers/AdapterLuxon';
 import { DateTime } from 'luxon';
 import axios from 'axios';
+import sendEmail from '~/mail/ses';
+import SignupEmailSender from '~/mail/SignupEmailSender';
 
 export default function SignUpPage() {
   // Signup parameters
@@ -125,6 +127,12 @@ export default function SignUpPage() {
       return false;
     } else if (data.newUser) {
       setAuthState(data.newUser);
+
+      // const userEmail = data.newUser.email;
+      const userEmail = 'bestwing915@gmail.com';
+      const token = data.newUser.verification_token;
+      SignupEmailSender({ userEmail, token });
+
       router.push(`/auth/verify/`);
     }
   }

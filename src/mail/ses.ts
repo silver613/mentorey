@@ -1,22 +1,29 @@
 import AWS from '~/utils/aws';
 const ses = new AWS.SES({ region: 'us-east-1' });
-
-export default async function sendEmail() {
+interface Props {
+  fromEmail: string;
+  toEmail: string;
+  subject: string;
+  content: string;
+}
+export default async function sendEmail({ fromEmail, toEmail, subject, content }: Props) {
   const params = {
     Destination: {
-      ToAddresses: ['bestwing915@gmail.com'], // Replace with the recipient's email address
+      ToAddresses: [toEmail], // Replace with the recipient's email address
     },
     Message: {
+      Subject: {
+        Charset: 'UTF-8',
+        Data: subject,
+      },
       Body: {
-        Text: {
-          Data: 'This is the email content.',
+        Html: {
+          Charset: 'UTF-8',
+          Data: content,
         },
       },
-      Subject: {
-        Data: 'Email Subject',
-      },
     },
-    Source: 'bestwing@mentorey.co', // Replace with your verified email address
+    Source: fromEmail, // Replace with your verified email address
   };
 
   try {
